@@ -1,4 +1,8 @@
-// © Solenoid-IT
+/**
+ * sRPC Client SDK
+ * Copyright © 2026 Solenoid-IT
+ * Licensed under the Apache License, Version 2.0
+ */
 
 
 

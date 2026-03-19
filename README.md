@@ -87,4 +87,19 @@ The strength of sRPC lies in its **scalability**. By decoupling the action from 
 **Write the function, and it's ready.**
 
 ---
+
+## ⚖️ License & Trademarks
+
+### Software License
+This project is licensed under the **Apache License 2.0**. This means you are free to use, modify, and distribute the software, provided that you retain the original copyright notice and adhere to the terms of the license.
+
+### Trademark Policy
+**Solenoid™** and **sRPC™** (Solenoid Remote Procedure Call) are trademarks of **Solenoid-IT**. 
+
+While the sRPC protocol specification and its reference implementations are open for public use and contribution, the names and logos associated with this project are protected. 
+- **Allowed:** Using the name "sRPC" to describe compatibility with the protocol (e.g., "This library supports the sRPC™ protocol").
+- **Not Allowed:** Using the names in a way that implies an official endorsement by Solenoid-IT or creating derivative works that use "Solenoid" or "sRPC" as their primary brand without written permission.
+
+For any questions regarding trademark usage, please open an issue or contact us at [support@solenoid.it].
+---
 <p align="center">Solenoid IT - 2026</p>
