@@ -11,7 +11,7 @@
 
 ## 💡 The Core Concept
 Traditional **REST** architectures rely on static binding definitions:
-> `POST /api/user/123/order` → `OrderController::create`
+> `POST /api/users/123/orders` → `OrderController::create`
 
 **sRPC** moves away from static bindings in favor of a **file-system based approach**. The client directly indicates the action to be performed:
 > `RUN /api/user?m=Order.create`
@@ -59,13 +59,13 @@ The sRPC protocol introduces a custom HTTP approach to clearly distinguish remot
 ## 🌊 FLUID Principles
 sRPC replaces the traditional CRUD model with **FLUID**, a specialized scheme for resource management (databases, storage, files):
 
-| Initial | Operation | Purpose | REST Equivalent |
-| :--- | :--- | :--- | :--- |
-| **F** | **Find** | Retrieve a single element | `GET /{id}` |
-| **L** | **List** | Retrieve a list of elements | `GET /` |
-| **U** | **Update** | Modify an existing element | `PUT` / `PATCH` |
-| **I** | **Insert** | Create a new element | `POST` |
-| **D** | **Delete** | Remove a list of elements | `DELETE` |
+| Initial | Operation | Purpose | sRPC | REST Equivalent |
+| :--- | :--- | :--- | :--- | :--- |
+| **F** | **Find** | Retrieve a single element | `Nested/Resource.find` | `GET /{id}` |
+| **L** | **List** | Retrieve a list of elements | `Nested/Resource.list` | `GET /` |
+| **U** | **Update** | Modify an existing element | `Nested/Resource.update` | `PUT` / `PATCH` |
+| **I** | **Insert** | Create a new element | `Nested/Resource.insert` | `POST` |
+| **D** | **Delete** | Remove a list of elements | `Nested/Resource.delete` | `DELETE` |
 
 ---
 
