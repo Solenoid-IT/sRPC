@@ -19,7 +19,7 @@ export class Client
         }
         ;
 
-        const response = await fetch( `${ this.endpointPath }?m=${ action }`, {
+        const response = await fetch( `${ this.endpointPath }?p=${ action }`, {
             'method': this.native ? 'RUN' : 'POST',
             'headers': requestHeaders,
             'body': Client.getRequestBody( input ),

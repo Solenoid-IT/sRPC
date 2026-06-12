@@ -33,7 +33,7 @@ and requests registration of a new HTTP method, RUN.
 
 sRPC is action-oriented. A client targets a stable endpoint URI and
 identifies the procedure to execute through a query parameter containing a
-method path. The RUN method provides explicit protocol semantics for
+procedure path. The RUN method provides explicit protocol semantics for
 function invocation, distinguishing RPC execution from resource-oriented
 REST interactions.
 
@@ -50,7 +50,7 @@ sRPC defines a compact RPC profile over HTTP with two core properties:
 1. The request URI identifies a logical endpoint, not an individual REST
    resource.
 2. The procedure to execute is explicitly provided in a query parameter
-   (`m`) as a method path.
+   (`p`) as a procedure path.
 
 To make invocation intent explicit at the protocol layer, this document
 defines RUN as an HTTP method for procedure execution.
@@ -66,7 +66,7 @@ capitals, as shown here.
 This document uses the following terms:
 
 - Endpoint: stable URI that identifies a logical dispatch context.
-- Action (or Method Path): string provided in query parameter `m` that
+- Procedure: string provided in query parameter `p` that
   identifies the procedure to execute.
 - Payload: request content containing procedure arguments.
 
@@ -74,13 +74,13 @@ This document uses the following terms:
 
 In sRPC, procedure selection is split between URI and query:
 
-`Request = Endpoint + m (method path) + Payload`
+`Request = Endpoint + p (procedure path) + Payload`
 
-The endpoint remains stable across multiple actions. The `m` parameter is
-the dynamic selector and carries the method path, for example
-`Order.calculate` or `Home/Door.open`.
+The endpoint remains stable across multiple actions. The `p` parameter is
+the dynamic selector and carries the procedure path, for example
+`Order.insert` or `Home/Door.open`.
 
-The method-path syntax is intentionally language-neutral and can map to
+The procedure-path syntax is intentionally language-neutral and can map to
 classes, modules, namespaces, functions, or methods depending on server
 implementation.
 
@@ -92,15 +92,34 @@ action-oriented remote procedure execution.
 ## Semantics
 
 RUN indicates that the client asks the origin server to execute an
-application-defined procedure identified by `m`.
+application-defined procedure identified by `p`.
 
 RUN semantics are intentionally non-REST: the primary target is a
 procedure, not a resource state transfer operation.
 
 * **Safe:** No.
-* **Idempotent:** No (unless explicitly documented by the target action).
+- **Idempotent:** No (unless explicitly documented by the target procedure).
 * **Cacheable:** Response caching is application-dependent and controlled
   through standard HTTP cache fields.
+
+## Query Parameter `p`
+
+The query parameter `p` is the unique identifier for the procedure to execute.
+
+- `p` MUST be present in every sRPC request.
+- `p` value identifies univocally which procedure the client wishes to invoke.
+- `p` uses dot or slash notation for hierarchical naming (e.g., `Order.insert`,
+  `Home/Door.open`).
+- On the server implementation, `p` typically maps to a method of a class, a
+  function in a module, or an equivalent callable construct. The exact mapping
+  is server-defined and SHOULD be documented by the endpoint implementer.
+
+Example interpretation (pseudo-code):
+
+```
+p = "Job.start"    →  server interprets as: Job class, start method
+p = "Auth/User.login"  →  server interprets as: User class, login method
+```
 
 ## Request Construction
 
@@ -108,21 +127,32 @@ A conforming sRPC request:
 
 1. MUST use RUN, or a compatible fallback defined in
    Compatibility and Transition.
-2. MUST include query parameter `m`.
-3. MUST treat `m` as the full method path for dispatch.
+2. MUST include query parameter `p`.
+3. MUST treat `p` as the full procedure identifier for dispatch.
 4. MAY include a request payload containing action arguments.
 
 Example:
 
 ```http
-RUN /api/user?m=Order.calculate HTTP/1.1
+RUN /api/user?p=Order.insert HTTP/1.1
 Host: api.solenoid.it
 Content-Type: application/json
 
-{ "items": [101, 202] }
+[
+  {
+    "product": 101,
+    "qty": 1
+  },
+
+  {
+    "product": 202,
+    "qty": 2
+  }
+]
 ```
 
-If `m` is missing or invalid, the server MUST reject the request.
+If `p` is missing or invalid, the server MUST reject the request with HTTP 404
+and MUST include `sRPC-Error: 2` (Procedure Not Found) in the response headers.
 
 ## Response and Error Model
 
@@ -130,11 +160,11 @@ Implementations MUST use standard HTTP status codes for transport and
 request-processing outcomes.
 
 - `2xx` indicates successful execution.
-- `4xx` indicates client-side faults (for example invalid `m`, malformed
+- `4xx` indicates client-side faults (for example invalid `p`, malformed
   payload, unauthorized invocation).
 - `5xx` indicates server-side execution faults.
 
-For protocol-specific detection, a server MAY include `sRPC-Error` with an
+For protocol-specific detection, a server MUST include `sRPC-Error` with an
 integer value identifying the error category. When this header is present,
 the response body SHOULD begin with the prefix `sRPC :: ` followed by a
 machine-readable token.
@@ -145,8 +175,11 @@ When `sRPC-Error` is present in the response, its value MUST be an integer
 indicating the specific protocol-level error:
 
 - **1:** Endpoint Not Found – The target endpoint does not exist (HTTP 404).
-- **2:** Action Not Found – The specified action method `m` does not exist
+- **2:** Procedure Not Found – The specified procedure `p` does not exist
   or is not exposed (HTTP 404).
+
+When the server rejects a request with Procedure Not Found, it MUST send
+`sRPC-Error: 2` in the response headers.
 
 Additional codes MAY be defined in future versions. Clients SHOULD treat
 unknown codes as generic protocol errors.
@@ -166,7 +199,7 @@ HTTP/1.1 404 Not Found
 Content-Type: text/plain
 sRPC-Error: 2
 
-sRPC :: Action Not Found
+sRPC :: Procedure Not Found
 ```
 
 ## Rationale
@@ -215,12 +248,12 @@ Protocol (HTTP) Method Registry" according to [RFC9110].
 
 # Security Considerations
 
-The `m` method path is an execution selector and therefore security
+The `p` procedure path is an execution selector and therefore security
 critical.
 
 Implementations:
 
-1. MUST validate `m` against a strict allowlist of exposed actions.
+1. MUST validate `p` against a strict allowlist of exposed actions.
 2. MUST prevent path traversal and equivalent namespace-escape attacks.
 3. MUST apply authentication and authorization before dispatch.
 4. SHOULD implement replay protections for non-idempotent actions when
