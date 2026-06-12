@@ -1,7 +1,8 @@
 # 🚀 sRPC (Solenoid RPC)
 ### *A High-Scalability API Standard for Modern Developer Experience*
 
-**sRPC** is an advanced RPC (Remote Procedure Call) standard designed to accelerate API development. It focuses on **Developer Experience (DX)** and infinite scalability by eliminating the friction of manual route definitions.
+**sRPC** is an action-oriented RPC (Remote Procedure Call) protocol designed to accelerate API development over HTTP (also known as **RPC over HTTP**).
+It focuses on **Developer Experience (DX)** and infinite scalability by eliminating the friction of manual route definitions.
 
 <p align="center">
     <img src="https://solenoid.it/cdn/logo/sRPC.jpg" alt="sRPC Logo">
@@ -13,13 +14,13 @@
 Traditional **REST** architectures rely on static binding definitions:
 > `POST /api/users/123/orders` → `OrderController::create`
 
-**sRPC** moves away from static bindings in favor of a **file-system based approach**. The client directly indicates the action to be performed:
-> `RUN /api/user?m=Order.create`
+**sRPC** uses a stable endpoint URI and lets the client explicitly select the procedure to execute through the query parameter `p`:
+> `RUN /api/user?p=Order.insert`
 
-### Key Advantages:
-* **No Manual Routing:** Developers don't need to map every single route; the action is the route itself.
-* **Instant Availability:** As soon as a class method is written, it is immediately callable by the client.
-* **Subtree Isolation:** A single static endpoint (e.g., `/api/user`) can host a complex subtree of actions.
+### Core Properties:
+* **Stable Endpoint:** The URI identifies a logical dispatch context.
+* **Explicit Procedure Selector:** The `p` parameter identifies the procedure path (e.g., `Order.insert`, `Home/Door.open`).
+* **Action-Oriented Semantics:** `RUN` clearly expresses remote procedure execution over HTTP.
 
 ---
 
@@ -30,11 +31,11 @@ An **Endpoint** is the static entry point of the API (e.g., `/api/user`).
 * It serves as the bridge between the HTTP request and the sRPC logic.
 * It acts as a security gate where **Middlewares** (Authentication, Rate Limiting) are typically attached.
 
-### 2. Actions
-An **Action** is a server-side class method (e.g., `Order.create`).
-* Actions can be nested (e.g., `Store/Order.create`).
-* Each action can have its own specific **Middlewares** for granular control.
-* The system automatically maps the client's request to the corresponding function.
+### 2. Procedures
+A **Procedure** is the callable target identified by `p` (e.g., `Order.insert`).
+* Procedures can be hierarchical (e.g., `Store/Order.insert`, `Home/Door.open`).
+* The mapping from `p` to classes/modules/functions is server-defined.
+* Implementations should expose only allowlisted procedures.
 
 ---
 
@@ -42,22 +43,22 @@ An **Action** is a server-side class method (e.g., `Order.create`).
 The sRPC protocol is designed to be format-agnostic, offering maximum flexibility for data exchange.
 
 * **Format Agnostic:** While the protocol typically utilizes **JSON** or **PLAIN** text, there are no technical limitations on the use of other serialization formats.
-* **Input/Output:** Simplified handling of input parameters for **Actions** and the subsequent responses returned to the client.
-* **Error Management:** A standardized system for exception handling where **error codes and structures are defined by the application itself**, ensuring full control over business logic validation and reporting.
+* **Input/Output:** Simplified handling of input parameters for **Procedures** and the subsequent responses returned to the client.
+* **Error Management:** Transport and processing outcomes use standard HTTP status codes (`2xx`, `4xx`, `5xx`). For protocol-level detection, servers include the `sRPC-Error` response header (e.g., `1` Endpoint Not Found, `2` Procedure Not Found).
 
 ---
 
 ## 🌐 HTTP Transport & Compatibility
 The sRPC protocol introduces a custom HTTP approach to clearly distinguish remote actions from standard RESTful calls.
 
-* **Native Method:** In supported or native environments, sRPC requests use the **`RUN`** HTTP method.
-* **Fallback Support:** For environments where custom methods are not supported (e.g., certain browsers, legacy proxies, or restrictive CDNs), the system should falls back to **`POST`** for full compatibility.
-* **Consistency:** Regardless of the HTTP method used, the internal logic and action mapping remain identical.
+* **Native Method:** In supported environments, sRPC requests use the **`RUN`** HTTP method.
+* **Fallback Support:** Where `RUN` is blocked, clients can tunnel over **`POST`** with `X-HTTP-Method-Override: RUN`.
+* **Consistency:** Fallback requests should be processed with the same auth, policy, and dispatch rules as native `RUN`.
 
 ---
 
 ## 🌊 FLUID Principles
-sRPC replaces the traditional CRUD model with **FLUID**, a specialized scheme for resource management (databases, storage, files):
+sRPC recommends **FLUID** as a naming convention for action-oriented APIs. FLUID is optional and not required for protocol conformance:
 
 | Initial | Operation | Purpose | sRPC | REST Equivalent |
 | :--- | :--- | :--- | :--- | :--- |
@@ -76,7 +77,7 @@ sRPC natively adopts the **Entity** pattern. This ensures that every resource (o
 
 ## 🆚 sRPC vs REST
 While REST is limited by standard HTTP methods, sRPC acts as a **superset of REST capabilities**:
-* **Flexibility:** Beyond standard CRUD, sRPC allows for specialized custom actions on the same endpoint (e.g., `/api/token?m=Token.refresh`).
+* **Flexibility:** Beyond standard CRUD, sRPC allows specialized actions on the same endpoint (e.g., `/api/token?p=Token.refresh`).
 * **IoT & Remote Control:** sRPC is ideal for command-based contexts where actions aren't always tied to a resource but to an object (e.g., `Home/Door.open`, `Camera.take_snapshot`).
 
 ---

@@ -84,6 +84,8 @@ The procedure-path syntax is intentionally language-neutral and can map to
 classes, modules, namespaces, functions, or methods depending on server
 implementation.
 
+The official protocol project is available at https://github.com/Solenoid-IT/sRPC.
+
 A reference implementation is available at https://github.com/Solenoid-IT/simba-app.
 It demonstrates how `p` is interpreted server-side as a procedure identifier
 and how RUN requests are dispatched in practice.
