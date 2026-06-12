@@ -44,7 +44,7 @@ The sRPC protocol is designed to be format-agnostic, offering maximum flexibilit
 
 * **Format Agnostic:** While the protocol typically utilizes **JSON** or **PLAIN** text, there are no technical limitations on the use of other serialization formats.
 * **Input/Output:** Simplified handling of input parameters for **Procedures** and the subsequent responses returned to the client.
-* **Error Management:** Transport and processing outcomes use standard HTTP status codes (`2xx`, `4xx`, `5xx`). For protocol-level detection, servers include the `sRPC-Error` response header (e.g., `1` Endpoint Not Found, `2` Procedure Not Found).
+* **Error Management:** Transport and processing outcomes use standard HTTP status codes (`2xx`, `4xx`, `5xx`). For protocol-level detection, servers include the `sRPC-Error` response header (e.g., `1` Endpoint Not Found, `2` Missing Procedure Selector, `3` Procedure Not Found).
 
 ---
 
