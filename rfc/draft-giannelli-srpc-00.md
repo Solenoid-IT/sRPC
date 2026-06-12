@@ -8,8 +8,6 @@ submissiontype: IETF
 ipr: trust200902
 area: Applications and Real-Time
 keyword: [RPC, HTTP, RUN, API, FLUID, Solenoid]
-
-stand-alone: yes
 pi: [toc, sortrefs, symrefs]
 
 author:
@@ -59,7 +57,7 @@ defines RUN as an HTTP method for procedure execution.
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
 "OPTIONAL" in this document are to be interpreted as described in
-BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+BCP 14 [RFC2119], [RFC8174] when, and only when, they appear in all
 capitals, as shown here.
 
 This document uses the following terms:
@@ -142,7 +140,7 @@ Example:
 
 ```http
 RUN /api/user?p=Order.insert HTTP/1.1
-Host: api.solenoid.it
+Host: api.example.com
 Content-Type: application/json
 
 [
