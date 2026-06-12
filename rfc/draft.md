@@ -224,6 +224,14 @@ pattern:
 4. **Insert**: Create new data.
 5. **Delete**: Remove data.
 
+Example FLUID procedure paths (p):
+
+- `Order.find`
+- `Order.list`
+- `Order.update`
+- `Order.insert`
+- `Order.delete`
+
 # Compatibility & Transition
 
 In environments where RUN is blocked by intermediaries or client
