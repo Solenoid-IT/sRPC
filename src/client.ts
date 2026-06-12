@@ -9,7 +9,7 @@ export class Client
 
 
 
-    public async run (action : string, input : any = null, headers : Record<string, string> = {}) : Promise<Response>
+    public async run (action : string, input : any = null, headers : Record<string, string> = {}, timeout : number = 0) : Promise<Response>
     {
         const requestHeaders =
         {
@@ -22,7 +22,8 @@ export class Client
         const response = await fetch( `${ this.endpointPath }?m=${ action }`, {
             'method': this.native ? 'RUN' : 'POST',
             'headers': requestHeaders,
-            'body': Client.getRequestBody( input )
+            'body': Client.getRequestBody( input ),
+            'signal': timeout > 0 ? AbortSignal.timeout( timeout * 1000 ) : undefined
         });
 
         const responseHeaders : Record<string, string> = {};

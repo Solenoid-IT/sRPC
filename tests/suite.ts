@@ -22,8 +22,6 @@ async function testRunWithNativeRUN () : Promise<void>
     console.log( 'native RUN body:', body );
 }
 
-
-
 async function testRunWithPostFallback () : Promise<void>
 {
     const client = new Client( 'https://api.example.com/api/user', false );
